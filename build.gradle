@@ -1,0 +1,61 @@
+// Private/enterprise plugins from custom repos, thats why adding buildScript
+// Some plugins (especially internal or enterprise ones) aren't available on the Gradle Plugin Portal. To use them, you declare the plugin classpath in buildscript {} and apply it manually.
+buildscript {
+	dependencies {
+		classpath("org.flywaydb:flyway-database-postgresql:10.3.0")
+	}
+}
+
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.5.3'
+	id 'io.spring.dependency-management' version '1.1.7'
+	id 'org.flywaydb.flyway' version '10.18.0'
+
+}
+
+
+group = 'com.java'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(17)
+	}
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.flywaydb:flyway-core'
+	implementation 'org.flywaydb:flyway-database-postgresql'
+	implementation 'org.postgresql:postgresql'
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+
+
+flyway {
+	url = 'jdbc:postgresql://localhost:5432/postgres'
+	user = 'postgres'
+	password = 'postgres'
+	schemas = ['public']
+	locations = ['filesystem:src/main/resources/db/migration']
+}
+
